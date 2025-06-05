@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Legion of Slots</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #252529;
+            color: #fff;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .btn {
+            background-color: #4674d0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px #264a85;
+        }
+
+        .shop-toggle {
+            text-align: center;
+            margin: 20px;
+        }
+
+        #shopContainer {
+            max-width: 1000px;
+            margin: auto;
+            padding: 0 20px;
+            background: #1a191c;
+            border-radius: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.6s ease, opacity 0.4s ease;
+        }
+
+        #shopContainer.open {
+            max-height: 800px;
+            padding: 20px;
+            opacity: 1;
+        }
+
+
+        .card {
+            width: 280px;
+            height: 140px;
+            position: relative;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            transition: transform 0.2s ease;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        .card:hover img {
+            position: absolute;
+            z-index: 10;
+        }
+
+        /*-----SLOTS-----*/
+
+        #slotMachineContainer {
+            text-align: center;
+            background: #1a191c;
+            border-radius: 20px;
+            max-width: 640px;
+            margin: 40px auto;
+            padding: 25px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .slot-header {
+            margin-bottom: 20px;
+        }
+
+        .slot-header img {
+            max-width: 240px;
+            height: auto;
+        }
+
+        .slot-grid {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .reel {
+            width: 90px;
+            height: 270px;
+            overflow: hidden;
+            border: 2px solid #252529;
+            border-radius: 12px;
+            background: #0e0d0f;
+            position: relative;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .reel-strip {
+            position: absolute;
+            width: 100%;
+        }
+
+        .symbol {
+            width: 90px;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .symbol-img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+            pointer-events: none;
+            user-select: none;
+            transition: filter 0.2s ease, opacity 0.2s ease;
+        }
+
+        .reel-blur .symbol-img {
+            filter: blur(1.2px);
+            opacity: 0.7;
+        }
+
+        .symbol-img.win {
+            filter: drop-shadow(0 0 8px #4674d0);
+            transform: scale(1.1);
+            transition: filter 0.3s, transform 0.3s;
+        }
+
+        .symbol-img.win-symbol {
+            filter: drop-shadow(0 0 6px #4674d0) brightness(1.3);
+            transform: scale(1.05);
+            transition: filter 0.3s ease, transform 0.3s ease;
+        }
+
+
+
+        .info-panel {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            background: #252529;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #2a2a2d;
+            font-size: 1.1rem;
+            font-weight: 500;
+            box-shadow: inset 0 0 5px #000;
+        }
+
+        .info-panel div {
+            flex: 1;
+            text-align: center;
+        }
+
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: #252529;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #2a2a2d;
+            box-shadow: inset 0 0 5px #000;
+        }
+
+        .control-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ddd;
+            min-width: 70px;
+            text-align: left;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+        }
+
+        .control-row span {
+            min-width: 30px;
+            display: inline-block;
+            text-align: center;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .ctrl-btn {
+            background-color: #36363a;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .ctrl-btn:hover {
+            background-color: #4a4a4e;
+        }
+
+        .ctrl-btn.wide {
+            min-width: 60px;
+        }
+
+        .spin-btn {
+            background: #4674d0;
+            color: #fff;
+            padding: 14px 26px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 12px #264a85, inset 0 0 5px #fff2;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .spin-btn:hover {
+            background: #6c91da;
+            transform: scale(1.05);
+        }
+
+        @keyframes winPulse {
+            0% {
+                box-shadow: 0 0 0px #4674d0;
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 0 20px #4674d0, 0 0 30px #4674d0;
+                transform: scale(1.03);
+            }
+
+            100% {
+                box-shadow: 0 0 0px #4674d0;
+                transform: scale(1);
+            }
+        }
+
+        .win-glow {
+            animation: winPulse 1.5s ease-in-out 3;
+            border: 2px solid #4674d0;
+            border-radius: 12px;
+            z-index: 5;
+        }
+
+        #customAlert {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .custom-alert-box {
+            background-color: #3c3c3f;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            border: 2px solid #4674d0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            box-shadow: 0 0 12px #264a85;
+            opacity: 0;
+            transform: scale(0.95);
+            animation: showAlert 0.4s ease forwards, hideAlert 0.4s ease forwards 2.5s;
+        }
+
+        @keyframes showAlert {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes hideAlert {
+            to {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+        }
+    </style>
+</head>
+<canvas id="winCanvas"
+    style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:999;"></canvas>
+
+<body>
+    <div id="customAlert" style="display:none;">
+        <div class="custom-alert-box" id="customAlertBox"></div>
+    </div>
+
+    <div id="slotMachineContainer">
+        <div class="slot-header">
+            <img src="https://i.imgur.com/YB4REkl.png" alt="Legion Slots Logo" />
+        </div>
+        <div class="slot-grid" id="slotGrid"></div>
+        <div class="info-panel">
+            <div>Forumpunkte: <span id="credits">1000</span></div>
+            <div>Gewettete Forumpunkte: <span id="totalBet">1</span></div>
+        </div>
+        <div class="control-panel">
+            <div class="control-group">
+                <span class="control-label">Bet</span>
+                <div class="control-row">
+                    <button class="ctrl-btn" onclick="adjustBet(-1)">–</button>
+                    <span id="bet">1</span>
+                    <button class="ctrl-btn" onclick="adjustBet(1)">+</button>
+                    <button class="ctrl-btn wide" onclick="maxBet()">MAX</button>
+                    <button class="ctrl-btn wide" onclick="allIn()">ALL IN</button>
+                </div>
+            </div>
+            <div class="control-group">
+                <span class="control-label">Lines</span>
+                <div class="control-row">
+                    <button class="ctrl-btn" onclick="adjustLines(-1)">–</button>
+                    <span id="lines">1</span>
+                    <button class="ctrl-btn" onclick="adjustLines(1)">+</button>
+                </div>
+            </div>
+            <div style="margin-top: 10px;">
+                <button class="spin-btn" id="spinButton" onclick="spin()">▶ SPIELEN</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="shop-toggle">
+        <button class="btn" onclick="toggleShop()">🎩 LegionBank</button>
+    </div>
+    <div id="shopContainer">
+        <div class="card" onclick="buyCredits(5000)"><img src="https://i.ibb.co/Gvp975HP/basic.png" alt="Basic" /></div>
+        <div class="card" onclick="buyCredits(10000)"><img src="https://i.ibb.co/SXKSBF8K/silverline.png" alt="Silverline" /></div>
+        <div class="card" onclick="buyCredits(50000)"><img src="https://i.ibb.co/jP3JGDTY/obsidian.png" alt="Obsidian" /></div>
+        <div class="card" onclick="buyCredits(75000)"><img src="https://i.ibb.co/HDfDMD4R/vantacore.png" alt="Vantacore" /></div>
+        <div class="card" onclick="buyCredits(100000)"><img src="https://i.ibb.co/DDT5J2hm/ascendant.png" alt="Ascendant" /></div>
+    </div>
+
+
+    <script>
+        let credits = 1000;
+
+        function toggleShop() {
+            const shop = document.getElementById("shopContainer");
+            const isOpen = shop.classList.toggle("open");
+
+            if (isOpen) {
+                setTimeout(() => {
+                    shop.scrollIntoView({ behavior: "smooth", block: "start" });
+                }, 300);
+            }
+        }
+
+
+        function buyCredits(amount) {
+            credits += amount;
+            updatePanel();
+            showAlert(`Du hast dir ${amount} Forumpunkte gekauft!`);
+        }
+
+
+        // Hover 3D tilt effect
+        document.querySelectorAll('.card').forEach(card => {
+            const img = card.querySelector('img');
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = -(y - centerY) / 10; // more subtle
+                const rotateY = (x - centerX) / 10;
+                img.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                img.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+            });
+
+
+        });
+    </script>
+    <script>
+        const symbolHeight = 90;
+        const totalSymbols = 20;
+        const loops = 5;
+        const extraSymbols = 50;
+        const totalStripSymbols = totalSymbols * loops + extraSymbols;
+        const maxScroll = symbolHeight * totalStripSymbols;
+        let lastScrollPositions = Array(5).fill(0);
+
+        function showAlert(message) {
+            const alertBox = document.getElementById('customAlert');
+            const box = document.getElementById('customAlertBox');
+
+            box.textContent = message;
+            alertBox.style.display = 'flex';
+
+            box.classList.remove('custom-alert-box');
+            void box.offsetWidth;
+            box.classList.add('custom-alert-box');
+
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 3000);
+        }
+
+        function launchParticles() {
+            const canvas = document.getElementById('winCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = Array.from({ length: 50 }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height / 2,
+                dx: (Math.random() - 0.5) * 4,
+                dy: Math.random() * 3 + 2,
+                radius: Math.random() * 4 + 2,
+                color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+                alpha: 1
+            }));
+
+            let frame = 0;
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.dx;
+                    p.y += p.dy;
+                    p.alpha -= 0.02;
+                    ctx.beginPath();
+                    ctx.globalAlpha = p.alpha;
+                    ctx.fillStyle = p.color;
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                frame++;
+                if (frame < 60) requestAnimationFrame(animate);
+                else ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.globalAlpha = 1;
+            }
+            animate();
+        }
+
+        const symbols = [
+            { name: 'mrp', src: 'https://i.ibb.co/XNK5GLc/mrp.png' },
+            { name: 'jvs', src: 'https://i.ibb.co/5X1WSn97/jvs.png' },
+            { name: 'map', src: 'https://i.ibb.co/SDt8nTNm/map.png' },
+            { name: 'ttt', src: 'https://i.ibb.co/b5pNwrJh/ttt.png' },
+            { name: 'scp', src: 'https://i.ibb.co/Kz0Yqhpt/scp.png' },
+            { name: 'sensei', src: 'https://i.ibb.co/fzSZJQ8K/sensei.png' }
+        ];
+
+        const symbolMultipliers = {
+            sensei: 5,
+            scp: 1,
+            jvs: 1,
+            map: 1,
+            mrp: 1,
+            ttt: 1
+        };
+
+        let bet = 10;
+        let lines = 1;
+
+        function adjustBet(amount) {
+            const current = bet;
+
+            let step;
+            if (current < 100) step = 10;
+            else step = 100;
+
+            let newBet = current + amount * step;
+
+            newBet = Math.max(10, Math.min(1000, newBet));
+            bet = newBet;
+
+            updatePanel();
+        }
+
+        function allIn() {
+            bet = Math.min(credits);
+            updatePanel();
+        }
+
+        function adjustLines(amount) {
+            lines = Math.max(1, Math.min(3, lines + amount));
+            updatePanel();
+        }
+
+        function maxBet() {
+            bet = 1000;
+            lines = 3;
+            updatePanel();
+        }
+
+        function updatePanel() {
+            document.getElementById('bet').textContent = bet;
+            document.getElementById('lines').textContent = lines;
+            document.getElementById('totalBet').textContent = bet * lines;
+            document.getElementById('credits').textContent = credits;
+        }
+
+        function createInitialGrid() {
+            const grid = document.getElementById("slotGrid");
+            grid.innerHTML = "";
+
+            for (let i = 0; i < 5; i++) {
+                const reel = document.createElement("div");
+                reel.className = "reel";
+
+                const strip = document.createElement("div");
+                strip.className = "reel-strip";
+
+                for (let j = 0; j < totalStripSymbols * 2; j++) {
+                    const symData = symbols[j % symbols.length];
+
+                    const sym = document.createElement("div");
+                    sym.className = "symbol";
+                    sym.setAttribute("data-symbol", symData.name);
+
+                    const img = document.createElement("img");
+                    img.src = symData.src;
+                    img.alt = symData.name;
+                    img.className = "symbol-img";
+
+                    sym.appendChild(img);
+                    strip.appendChild(sym);
+                }
+
+                reel.appendChild(strip);
+                grid.appendChild(reel);
+            }
+        }
+
+        function getVisibleSymbols() {
+            const reels = document.querySelectorAll(".reel-strip");
+            const visibleGrid = [[], [], []];
+
+            reels.forEach((strip, colIndex) => {
+                const symbols = Array.from(strip.children);
+                const match = strip.style.transform.match(/-?\d+/);
+                const transformY = parseFloat(match?.[0] || 0);
+                const offset = Math.floor(Math.abs(transformY) / symbolHeight);
+
+                for (let row = 0; row < 3; row++) {
+                    const symbolEl = symbols[offset + row];
+                    const symbol = symbolEl?.getAttribute("data-symbol") || "null";
+                    visibleGrid[row][colIndex] = symbol;
+                }
+            });
+
+            return visibleGrid;
+        }
+
+        function checkWins(visibleGrid) {
+            const winLines = [];
+
+            for (let row = 0; row < lines; row++) {
+                const currentLine = visibleGrid[row];
+                let count = 1;
+                let startCol = 0;
+
+                for (let col = 1; col < currentLine.length; col++) {
+                    if (currentLine[col] === currentLine[col - 1]) {
+                        count++;
+                    } else {
+                        if (count >= 3) {
+                            winLines.push({
+                                row,
+                                startCol,
+                                count,
+                                symbol: currentLine[col - 1]
+                            });
+                        }
+                        count = 1;
+                        startCol = col;
+                    }
+                }
+
+                if (count >= 3) {
+                    winLines.push({
+                        row,
+                        startCol,
+                        count,
+                        symbol: currentLine[currentLine.length - 1]
+                    });
+                }
+            }
+
+            return winLines;
+        }
+
+        function applyWinEffect(winLines) {
+            const reels = document.querySelectorAll(".reel-strip");
+
+            winLines.forEach(({ row, startCol, count }) => {
+                for (let col = startCol; col < startCol + count; col++) {
+                    const strip = reels[col];
+                    const match = strip.style.transform.match(/-?\d+/);
+                    const transformY = parseFloat(match?.[0] || 0);
+                    const offset = Math.floor(Math.abs(transformY) / symbolHeight);
+                    const symbolEl = strip.children[offset + row];
+                    const img = symbolEl?.querySelector(".symbol-img");
+                    if (img) img.classList.add("win-symbol");
+                }
+            });
+
+            setTimeout(() => {
+                document.querySelectorAll('.win-symbol').forEach(img => {
+                    img.classList.remove('win-symbol');
+                });
+            }, 2000);
+        }
+
+
+        function spin() {
+            const spinBtn = document.getElementById('spinButton');
+            const cost = bet * lines;
+            if (credits < cost) return showAlert("Nicht genügend Forumpunkte!");
+            credits -= cost;
+            updatePanel();
+            spinBtn.disabled = true;
+
+            const reels = document.querySelectorAll(".reel");
+
+            const maxScroll = symbolHeight * totalStripSymbols;
+
+            reels.forEach((reel, index) => {
+                const strip = reel.querySelector(".reel-strip");
+
+                const prevScroll = lastScrollPositions[index];
+
+                const MIN_SPIN = totalSymbols * 2;
+                const MAX_SPIN = totalSymbols * 3;
+                const spinDistance = (MIN_SPIN + Math.floor(Math.random() * (MAX_SPIN - MIN_SPIN))) * symbolHeight;
+
+                const rawTargetScroll = prevScroll + spinDistance;
+                const visualScroll = rawTargetScroll;
+                const wrappedScroll = rawTargetScroll % (symbolHeight * totalStripSymbols);
+                lastScrollPositions[index] = wrappedScroll;
+
+                strip.style.transition = 'none';
+                strip.style.transform = `translateY(-${prevScroll}px)`;
+                void strip.offsetHeight;
+
+                const spinTime = 1000 + index * 500;
+
+                setTimeout(() => {
+                    reel.classList.add("reel-blur");
+
+                    strip.style.transition = `transform ${spinTime}ms cubic-bezier(0.1, 0.3, 0.2, 1)`;
+                    strip.style.transform = `translateY(-${visualScroll}px)`;
+
+                    setTimeout(() => {
+                        reel.classList.remove("reel-blur");
+
+                        if (visualScroll >= symbolHeight * totalStripSymbols) {
+                            strip.style.transition = 'none';
+                            strip.style.transform = `translateY(-${wrappedScroll}px)`;
+                        }
+                    }, spinTime + 100);
+                }, index * 400);
+            });
+
+            const totalDelay = (reels.length - 1) * 400 + 1000 + (reels.length - 1) * 500;
+
+            setTimeout(() => {
+                const visible = getVisibleSymbols();
+                const winLines = checkWins(visible);
+
+                if (winLines.length > 0) {
+                    let payout = 0;
+
+                    winLines.forEach(({ symbol, count }) => {
+                        const base = bet * count * 2;
+                        const multiplier = symbolMultipliers[symbol] || 1;
+                        payout += base * multiplier;
+                    });
+
+                    credits += payout;
+                    applyWinEffect(winLines);
+                    showAlert(`🎉 Du hast ${payout} Forumpunkte gewonnen!`);
+
+                    launchParticles?.();
+                }
+
+                updatePanel();
+                spinBtn.disabled = false;
+            }, totalDelay + 200);
+        }
+
+        createInitialGrid();
+        updatePanel();
+    </script>
+</body>
+
+</html>
